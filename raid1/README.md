@@ -19,9 +19,13 @@ $ sudo mdadm --create --verbose /dev/md0 --level=mirror --raid-devices=2 /dev/sd
 Esto significa:
 
 sudo mdadm --create >> crear un disco RAID
+
 /dev/md0 >> será el nombre del disco RAID
+
 --level=mirror  >> esto indica que es un RAID de nivel 1
+
 --raid-devices=2 >> esto indica que vamos a usar 2 discos
+
 /dev/sdb /dev/sdc >> estos son los nombre de los discos a incluir en el RAID
 
 Comprobamos que están correctamente montados
