@@ -52,5 +52,5 @@ No podemos olvidar que tenemos que abrir el router el puerto udp 3000 hacia el e
 
 *** Conexión desde un móvil Android con la aplicación OpenVPN, importando user1.ovpn
 
-![openVPN](https://imgur.com/MRNwEyb.png)
+![<img src="openVPN" width="250"/>](https://imgur.com/MRNwEyb.png)
 
