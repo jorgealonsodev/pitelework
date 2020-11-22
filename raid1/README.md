@@ -77,6 +77,7 @@ mdadm --manage /dev/md0 --fail /dev/sdb1
 ```
 #Así será su estado después de marcar como fallido el RAID.
 
+```
 $cat /proc/mdstat 
 Personalities : [raid1] 
 md0 : active raid1 sda1[0] sdb1[1](F)
@@ -91,13 +92,14 @@ $ cat /proc/mdstat
 Personalities : [raid1] 
 md0 : active raid1 sda1[0]
       19904512 blocks super 1.2 [2/1] [U_]
-
 # Apagar y meter disco nuevo
+```
 
 Añadir un nuevo disco al RAID
 
 Comprobamos cual es el disco a añadir al RAID
 
+```
 $ lsblk 
 NAME        MAJ:MIN RM  SIZE RO TYPE  MOUNTPOINT
 sda           8:0    1   29G  0 disk  
@@ -108,7 +110,7 @@ sdb           8:16   1 28.7G  0 disk
 mmcblk0     179:0    0 59.5G  0 disk  
 ├─mmcblk0p1 179:1    0  256M  0 part  /boot
 └─mmcblk0p2 179:2    0 59.2G  0 part  /
-
+```
 Copiamos la tabla de particiones del disco en producción al nuevo disco.
 
 ```
