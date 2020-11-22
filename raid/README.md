@@ -10,7 +10,7 @@ Comprobamos cuales son los discos con los que vamos a hacer el RAID1
 ```
 $ lsblk
 ```
-![https://imgur.com/yeShnNb](https://imgur.com/yeShnNb)
+[](https://imgur.com/yeShnNb)
 
 En este caso son sda1 y sdd2 . Y el comando para crear un solo disco de tipo RAID 0 es:
 
