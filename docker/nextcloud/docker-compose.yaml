@@ -1,43 +1,6 @@
-version: '3'
+version: '3.2'
 
 services:
-  nginx-proxy:
-    image: budry/jwilder-nginx-proxy-arm
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-      - /mnt/certs:/etc/nginx/certs:ro
-      - /mnt/confd:/etc/nginx/conf.d
-      - /mnt/vhostd:/etc/nginx/vhost.d
-      - /mnt/html:/usr/share/nginx/html
-    labels:
-      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
-
-  letsencrypt:
-    image: duch/letsencrypt-nginx-proxy-companion:stable
-    restart: always
-    volumes:
-      - /mnt/certs:/etc/nginx/certs:rw
-      - /mnt/confd:/etc/nginx/conf.d
-      - /mnt/vhostd:/etc/nginx/vhost.d
-      - /mnt/html:/usr/share/nginx/html
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-
-  nginx_fredrikson:
-    image: nginx
-    restart: always
-    expose:
-      - "80"
-    volumes:
-      - /mnt/www:/usr/share/nginx/html:ro
-    environment:
-      - VIRTUAL_HOST=pitelework.duckdns.org
-      - LETSENCRYPT_HOST=pitelework.duckdns.org
-      - LETSENCRYPT_EMAIL=jorgealonsodev@gmail.com
-      
   db:
     image: postgres
     restart: always
@@ -66,9 +29,6 @@ services:
       - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
       - NEXTCLOUD_ADMIN_PASSWORD_FILE=/run/secrets/nextcloud_admin_password
       - NEXTCLOUD_ADMIN_USER_FILE=/run/secrets/nextcloud_admin_user
-      - VIRTUAL_HOST=nc.pitelework.duckdns.org
-      - LETSENCRYPT_HOST=nc.pitelework.duckdns.org
-      - LETSENCRYPT_EMAIL=jorgealonsodev@gmail.com
     depends_on:
       - db
     secrets:
@@ -77,6 +37,7 @@ services:
       - postgres_db
       - postgres_password
       - postgres_user
+
 
 secrets:
   nextcloud_admin_password:
