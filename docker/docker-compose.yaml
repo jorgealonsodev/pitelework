@@ -26,7 +26,7 @@ services:
       - /mnt/html:/usr/share/nginx/html
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
-  nginx_fredrikson:
+  nginx-web:
     image: nginx
     restart: always
     expose:
@@ -37,7 +37,46 @@ services:
       - VIRTUAL_HOST=pitelework.duckdns.org
       - LETSENCRYPT_HOST=pitelework.duckdns.org
       - LETSENCRYPT_EMAIL=jorgealonsodev@gmail.com
-      
+
+  php-web:
+    build: .
+    ports: 
+      - "8001:80"
+    volumes:
+      - /mnt/www/lamp:/var/www/html/
+    links:
+      - dbm
+    environment:
+      - VIRTUAL_HOST=pitelework.duckdns.org
+      - LETSENCRYPT_HOST=pitelework.duckdns.org
+      - LETSENCRYPT_EMAIL=jorgealonsodev@gmail.com   
+
+  dbm:
+    image: mysql:8.0
+      ports: 
+        - "3306:3306"
+      command: --default-authentication-plugin=mysql_native_password
+      environment:
+        MYSQL_DATABASE: control_asistencia
+        MYSQL_USER: pitelework
+        MYSQL_PASSWORD: k6jNS0*ZUx6ChZX&1OIZ%GlYk6
+        MYSQL_ROOT_PASSWORD: k6jNS0*ZUx6ChZX&1OIZ%GlYk6 
+      volumes:
+        - /mnt/mysql/dump:/docker-entrypoint-initdb.d
+        - /mnt/mysql/etc/mysql/conf.d:/etc/mysql/conf.d
+        - /mnt/mysql/var/lib/mysql:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    links: 
+      - db:db
+    ports:
+      - 8000:80
+    environment:
+      MYSQL_USER: pitelework
+      MYSQL_PASSWORD: k6jNS0*ZUx6ChZX&1OIZ%GlYk6
+      MYSQL_ROOT_PASSWORD: k6jNS0*ZUx6ChZX&1OIZ%GlYk6 
+
   db:
     image: postgres
     restart: always
