@@ -38,44 +38,43 @@ services:
       - LETSENCRYPT_HOST=pitelework.duckdns.org
       - LETSENCRYPT_EMAIL=jorgealonsodev@gmail.com
 
-  php-web:
-    build: .
-    ports: 
-      - "8001:80"
-    volumes:
-      - /mnt/www/lamp:/var/www/html/
-    links:
-      - dbm
-    environment:
-      - VIRTUAL_HOST=pitelework.duckdns.org
-      - LETSENCRYPT_HOST=pitelework.duckdns.org
-      - LETSENCRYPT_EMAIL=jorgealonsodev@gmail.com   
-
-  dbm:
-    image: mysql:8.0
-      ports: 
-        - "3306:3306"
-      command: --default-authentication-plugin=mysql_native_password
-      environment:
-        MYSQL_DATABASE: control_asistencia
-        MYSQL_USER: pitelework
-        MYSQL_PASSWORD: k6jNS0*ZUx6ChZX&1OIZ%GlYk6
-        MYSQL_ROOT_PASSWORD: k6jNS0*ZUx6ChZX&1OIZ%GlYk6 
-      volumes:
-        - /mnt/mysql/dump:/docker-entrypoint-initdb.d
-        - /mnt/mysql/etc/mysql/conf.d:/etc/mysql/conf.d
-        - /mnt/mysql/var/lib/mysql:/var/lib/mysql
-
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    links: 
-      - db:db
+  php-apache:
+    image: php:7.2.1-apache
     ports:
-      - 8000:80
+      - 8050:80
+    volumes:
+      - /mnt/www/docker-study.loc/recipe-03/php:/var/www/html:z
+    links:
+      - 'mariadb'
     environment:
-      MYSQL_USER: pitelework
-      MYSQL_PASSWORD: k6jNS0*ZUx6ChZX&1OIZ%GlYk6
-      MYSQL_ROOT_PASSWORD: k6jNS0*ZUx6ChZX&1OIZ%GlYk6 
+      - VIRTUAL_HOST=ch.pitelework.duckdns.org
+      - LETSENCRYPT_HOST=ch.pitelework.duckdns.org
+      - LETSENCRYPT_EMAIL=jorgealonsodev@gmail.com
+
+  mariadb:
+    image: mariadb:10.1
+    volumes:
+      - /mnt/mariadb/data:/var/lib/mysql
+    environment:
+      TZ: "Europe/Madrid"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "no"
+      MYSQL_ROOT_PASSWORD: "Ew4UgwxmPz0lI1EsXcdrYT0scQ"
+      MYSQL_USER: 'pitelework'
+      MYSQL_PASSWORD: 'tEw4UgwxmPz0lI1EsXcdrYT0scQ'
+      MYSQL_DATABASE: 'control_asistencia'
+    ports:
+      - 3306:3306
+
+  adminer:
+    image: adminer
+    container_name: bi_adminer
+    restart: always
+    ports:
+      - 8090:8080
+    environment:
+      - VIRTUAL_HOST=adminer.pitelework.duckdns.org
+      - LETSENCRYPT_HOST=adminer.pitelework.duckdns.org
+      - LETSENCRYPT_EMAIL=jorgealonsodev@gmail.com
 
   db:
     image: postgres
@@ -105,8 +104,8 @@ services:
       - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
       - NEXTCLOUD_ADMIN_PASSWORD_FILE=/run/secrets/nextcloud_admin_password
       - NEXTCLOUD_ADMIN_USER_FILE=/run/secrets/nextcloud_admin_user
-      - VIRTUAL_HOST=nc.pitelework.duckdns.org
-      - LETSENCRYPT_HOST=nc.pitelework.duckdns.org
+      - VIRTUAL_HOST=cloud.pitelework.duckdns.org
+      - LETSENCRYPT_HOST=cloud.pitelework.duckdns.org
       - LETSENCRYPT_EMAIL=jorgealonsodev@gmail.com
     depends_on:
       - db
