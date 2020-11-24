@@ -47,10 +47,23 @@ services:
       - POSTGRES_DB_FILE=/run/secrets/postgres_db
       - POSTGRES_USER_FILE=/run/secrets/postgres_user
       - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
+    ports:
+      - 5432:5432
     secrets:
       - postgres_db
       - postgres_password
       - postgres_user
+  
+  adminer:
+    image: adminer
+    container_name: bi_adminer
+    restart: always
+    ports:
+      - 8090:8080
+    environment:
+      - VIRTUAL_HOST=adminer.pitelework.duckdns.org
+      - LETSENCRYPT_HOST=adminer.pitelework.duckdns.org
+      - LETSENCRYPT_EMAIL=jorgealonsodev@gmail.com
 
   app:
     image: nextcloud
@@ -77,6 +90,18 @@ services:
       - postgres_db
       - postgres_password
       - postgres_user
+
+  bitwarden:
+    image: bitwardenrs/server:latest 
+    expose:
+      - "90"
+    volumes:
+      - /mnt/bitwarden:/data
+    restart: on-failure
+    environment:
+      - VIRTUAL_HOST=bitwarden.pitelework.duckdns.org
+      - LETSENCRYPT_HOST=bitwarden.pitelework.duckdns.org
+      - LETSENCRYPT_EMAIL=jorgealonsodev@gmail.com
 
 secrets:
   nextcloud_admin_password:
