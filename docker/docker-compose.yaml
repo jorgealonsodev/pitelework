@@ -12,12 +12,10 @@ services:
     - 8071:8071
     volumes:
       - /mnt/odoo/odoo-web-data:/var/lib/odoo
-      - /mnt/odoo/setup:/opt/odoo/setup/
-      # Copiar contenido de la carpeta de /etc/odoo en la carpeta /mnt/odoo/config con el comando "docker cp odoo:/etc/odoo/ ." si no, se borrará el contenido de /etc/odoo
+      # - /mnt/odoo/setup:/opt/odoo/setup/
       - /mnt/odoo/config:/etc/odoo
       - /mnt/odoo/addons:/mnt/extra-addons
-      # Con esta hacer lo mismo que con la de arriba.
-      - /mnt/odoo/scss:/usr/lib/python3/dist-packages/odoo/addons/web/static/src/scss
+      # - /mnt/odoo/scss:/usr/lib/python3/dist-packages/odoo/addons/web/static/src/scss
     environment:
       - VIRTUAL_HOST=erp.pitelework.duckdns.org
       - VIRTUAL_PORT=8069
