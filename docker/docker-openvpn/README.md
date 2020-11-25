@@ -42,7 +42,7 @@ Para crear el archivo .ovpn del usuario usaremos 2 contenedores efímeros, que s
 
 ```
 $ docker run -v ~/datos-vpn:/etc/openvpn --rm -it mivpn easyrsa build-client-full user1 nopass
-$ docker run -v ~/datos-vpn:/etc/openvpn --rm mivpn ovpn_getclient USUARIO > ~/datos-vpn/user1.ovpn
+$ docker run -v ~/datos-vpn:/etc/openvpn --rm mivpn ovpn_getclient user1 > ~/datos-vpn/user1.ovpn
 ```
 Y con esto el servidor OpenVPN ya estaría funcionando, solo tenemos que entregarle el archivo .ovpn que le corresponde a cada usuario y este desde un cliente OpenVPN, importando el archivo, se conectaran de forma segura por VPN al servidor y a la red de la empresa.
 
