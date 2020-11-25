@@ -3,6 +3,7 @@ version: "3"
 services:
   nginx-proxy:
     image: budry/jwilder-nginx-proxy-arm
+    container_name: nginx-proxy
     restart: always
     ports:
       - "80:80"
@@ -15,9 +16,12 @@ services:
       - /mnt/html:/usr/share/nginx/html
     labels:
       - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
+    networks:
+      - net
 
   letsencrypt:
     image: duch/letsencrypt-nginx-proxy-companion:stable
+    container_name: letsencrypt
     restart: always
     volumes:
       - /mnt/certs:/etc/nginx/certs:rw
@@ -25,9 +29,16 @@ services:
       - /mnt/vhostd:/etc/nginx/vhost.d
       - /mnt/html:/usr/share/nginx/html
       - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - net  
 
+<<<<<<< HEAD
   nginx_web:
+=======
+  nginx-web:
+>>>>>>> test2
     image: nginx
+    container_name: landing-page
     restart: always
     expose:
       - "80"
@@ -37,8 +48,47 @@ services:
       - VIRTUAL_HOST=pitelework.duckdns.org
       - LETSENCRYPT_HOST=pitelework.duckdns.org
       - LETSENCRYPT_EMAIL=jorgealonsodev@gmail.com
+<<<<<<< HEAD
+=======
+    networks:
+      - net
+
+  web:
+    image: arm64v8/odoo:12.0
+    container_name: odoo
+    depends_on:
+      - db
+    ports: 
+    - 8069:8069
+    - 8071:8071
+    volumes:
+      -  /mnt/odoo/odoo-web-data:/var/lib/odoo
+      -  /mnt/odoo/setup:/opt/odoo/setup/
+      -  /mnt/odoo/config:/etc/odoo
+      -  /mnt/odoo/addons:/mnt/extra-addons
+    environment:
+      - VIRTUAL_HOST=erp.pitelework.duckdns.org
+      - LETSENCRYPT_HOST=erp.pitelework.duckdns.org
+      - LETSENCRYPT_EMAIL=jorgealonsodev@gmail.com
+    networks:
+      - net
+      - odoo
+>>>>>>> test2
 
   db:
+    image: postgres:10
+    container_name: odoo-db
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=odoo
+      - POSTGRES_USER=odoo
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - /mnt/odoo/data/pgdata:/var/lib/postgresql/data/pgdata
+    networks:
+      - odoo
+  
+  nextdb:
     image: postgres
     restart: always
     volumes:
@@ -53,6 +103,21 @@ services:
       - postgres_db
       - postgres_password
       - postgres_user
+    networks:
+      - net
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    ports:
+      - 8090:8080
+    environment:
+      - VIRTUAL_HOST=adminer.pitelework.duckdns.org
+      - LETSENCRYPT_HOST=adminer.pitelework.duckdns.org
+      - LETSENCRYPT_EMAIL=jorgealonsodev@gmail.com
+    networks:
+      - net  
 
   adminer:
     image: adminer
@@ -73,7 +138,7 @@ services:
     volumes:
       - /mnt/nextcloud/data:/var/www/html
     environment:
-      - POSTGRES_HOST=db
+      - POSTGRES_HOST=nextdb
       - POSTGRES_DB_FILE=/run/secrets/postgres_db
       - POSTGRES_USER_FILE=/run/secrets/postgres_user
       - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
@@ -83,13 +148,32 @@ services:
       - LETSENCRYPT_HOST=cloud.pitelework.duckdns.org
       - LETSENCRYPT_EMAIL=jorgealonsodev@gmail.com
     depends_on:
-      - db
+      - nextdb
     secrets:
       - nextcloud_admin_password
       - nextcloud_admin_user
       - postgres_db
       - postgres_password
       - postgres_user
+    networks:
+      - net
+
+  bitwarden:
+    image: bitwardenrs/server:latest
+    container_name: bitwarden
+    ports:
+      - 90:90
+      - 8070:80
+      - 3012:3012
+    volumes:
+      - /mnt/bitwarden:/data
+    restart: on-failure
+    environment:
+      - VIRTUAL_HOST=bitwarden.pitelework.duckdns.org
+      - LETSENCRYPT_HOST=bitwarden.pitelework.duckdns.org
+      - LETSENCRYPT_EMAIL=jorgealonsodev@gmail.com
+    networks:
+      - net
 
   bitwarden:
     image: bitwardenrs/server:latest
@@ -118,3 +202,11 @@ secrets:
     file: /mnt/nextcloud/secrets/postgres_password.txt # put postgresql password to this file
   postgres_user:
     file: /mnt/nextcloud/secrets/postgres_user.txt # put postgresql username to this file
+<<<<<<< HEAD
+=======
+
+networks:
+  net:
+  odoo:
+  next:
+>>>>>>> test2
