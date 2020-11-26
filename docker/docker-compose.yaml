@@ -1,6 +1,22 @@
 version: "3"
 
 services:
+  openvpn:
+    cap_add:
+     - NET_ADMIN
+    # image: jorgealonsodev/openvpn-pi:v1
+    image: darathor/openvpn
+    container_name: openvpn
+    ports:
+     - "1194:1194/udp"
+    restart: always
+    volumes:
+        - ~/datos-vpn:/etc/openvpn    
+    ports:
+      - 3000:1194/udp
+    networks:
+      - net
+
   web:
     image: arm64v8/odoo:12.0
     container_name: odoo
@@ -8,8 +24,8 @@ services:
     depends_on:
       - db
     ports: 
-    - 8069:8069
-    - 8071:8071
+      - 8069:8069
+      - 8071:8071
     volumes:
       - /mnt/odoo/odoo-web-data:/var/lib/odoo
       # - /mnt/odoo/setup:/opt/odoo/setup/
@@ -17,7 +33,7 @@ services:
       - /mnt/odoo/addons:/mnt/extra-addons
       # - /mnt/odoo/scss:/usr/lib/python3/dist-packages/odoo/addons/web/static/src/scss
     environment:
-      - VIRTUAL_HOST=erp.pitelework.duckdns.org
+      - VIRTUAL_HOST=erp.pitelework.duckdns.org,erp.vpn-pitelework.duckdns.org
       - VIRTUAL_PORT=8069
       - LETSENCRYPT_HOST=erp.pitelework.duckdns.org
       - LETSENCRYPT_EMAIL=jorgealonsodev@gmail.com
@@ -42,6 +58,7 @@ services:
   nextdb:
     image: postgres
     restart: always
+    container_name: nextcloud-db
     volumes:
       - /mnt/postgres/db:/var/lib/postgresql/data
     environment:
@@ -62,7 +79,7 @@ services:
     ports:
       - 8090:8080
     environment:
-      - VIRTUAL_HOST=adminer.pitelework.duckdns.org
+      - VIRTUAL_HOST=adminer.pitelework.duckdns.org,adminer.vpn-pitelework.duckdns.org
       - LETSENCRYPT_HOST=adminer.pitelework.duckdns.org
       - LETSENCRYPT_EMAIL=jorgealonsodev@gmail.com
     networks:
@@ -72,6 +89,7 @@ services:
   app:
     image: nextcloud
     restart: always
+    container_name: nextcloud
     ports:
       - 8080:80
     volumes:
@@ -83,7 +101,7 @@ services:
       - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
       - NEXTCLOUD_ADMIN_PASSWORD_FILE=/run/secrets/nextcloud_admin_password
       - NEXTCLOUD_ADMIN_USER_FILE=/run/secrets/nextcloud_admin_user
-      - VIRTUAL_HOST=cloud.pitelework.duckdns.org
+      - VIRTUAL_HOST=cloud.pitelework.duckdns.org,cloud.vpn-pitelework.duckdns.org
       - LETSENCRYPT_HOST=cloud.pitelework.duckdns.org
       - LETSENCRYPT_EMAIL=jorgealonsodev@gmail.com
     depends_on:
@@ -108,7 +126,7 @@ services:
       - /mnt/bitwarden:/data
     restart: on-failure
     environment:
-      - VIRTUAL_HOST=bitwarden.pitelework.duckdns.org
+      - VIRTUAL_HOST=bitwarden.pitelework.duckdns.org,bitwarden.vpn-pitelework.duckdns.org
       - LETSENCRYPT_HOST=bitwarden.pitelework.duckdns.org
       - LETSENCRYPT_EMAIL=jorgealonsodev@gmail.com
     networks:
@@ -121,7 +139,6 @@ services:
     depends_on:
       - web
     ports:
-      - "80:80"
       - "443:443"
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
@@ -153,18 +170,34 @@ services:
     image: nginx
     container_name: landing-page
     restart: always
-    expose:
-      - "80"
+    ports:
+      - 8040:80
     volumes:
       - /mnt/www:/usr/share/nginx/html:ro
 
     environment:
-      - VIRTUAL_HOST=pitelework.duckdns.org
+      - VIRTUAL_HOST=pitelework.duckdns.org,vpn-pitelework.duckdns.org
       - LETSENCRYPT_HOST=pitelework.duckdns.org
       - LETSENCRYPT_EMAIL=jorgealonsodev@gmail.com
     networks:
       - net
 
+  vpn-proxy:
+    image: budry/jwilder-nginx-proxy-arm
+    container_name: vpn-proxy
+    restart: always
+    depends_on:
+      - web
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - /mnt/vpn/certs:/etc/nginx/certs:ro
+      - /mnt/vpn/confd:/etc/nginx/conf.d
+      - /mnt/vpn/vhostd:/etc/nginx/vhost.d
+      - /mnt/vpn/html:/usr/share/nginx/html
+    networks:
+      - net  
 
 secrets:
   nextcloud_admin_password:
