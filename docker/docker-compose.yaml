@@ -174,11 +174,23 @@ services:
       - 8040:80
     volumes:
       - /mnt/www:/usr/share/nginx/html:ro
-
     environment:
-      - VIRTUAL_HOST=pitelework.duckdns.org,vpn-pitelework.duckdns.org
+      - VIRTUAL_HOST=pitelework.duckdns.org
       - LETSENCRYPT_HOST=pitelework.duckdns.org
       - LETSENCRYPT_EMAIL=jorgealonsodev@gmail.com
+    networks:
+      - net
+
+  vpn-nginx-web:
+    image: nginx
+    container_name: vpn-landing-page
+    restart: always
+    ports:
+      - 8041:80
+    volumes:
+      - /mnt/www2:/usr/share/nginx/html:ro
+    environment:
+      - VIRTUAL_HOST=vpn-pitelework.duckdns.org
     networks:
       - net
 
@@ -190,6 +202,8 @@ services:
       - web
     ports:
       - "80:80"
+    environment: 
+      - DEFAULT_HOST=vpn-pitelework.duckdns.org
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - /mnt/vpn/certs:/etc/nginx/certs:ro
