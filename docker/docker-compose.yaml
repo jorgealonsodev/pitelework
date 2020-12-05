@@ -62,6 +62,7 @@ services:
     volumes:
       - /mnt/postgres/db:/var/lib/postgresql/data
     environment:
+      - NEXTCLOUD_OVERWRITEPROTOCOL=https
       - POSTGRES_DB_FILE=/run/secrets/postgres_db
       - POSTGRES_USER_FILE=/run/secrets/postgres_user
       - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
@@ -114,6 +115,8 @@ services:
       - postgres_user
     networks:
       - net
+    # Despues de lanzar docker-compose up ejecutar
+    # docker-compose exec --user www-data app php occ config:system:set overwriteprotocol --value="https"
 
   bitwarden:
     image: bitwardenrs/server:latest
@@ -140,6 +143,10 @@ services:
       - web
     ports:
       - "443:443"
+    # environment:
+    #   - HSTS=max-age=31536000;
+    #   - HSTS=includeSubDomains;
+    #   - HSTS=preload;
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - /mnt/certs:/etc/nginx/certs:ro
