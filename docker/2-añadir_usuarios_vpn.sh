@@ -8,6 +8,6 @@ echo '*** Introduzca la ruta donde quiere que se almacene el archivo de configur
 
 read ruta
 
-docker run -v ~/datos-vpn:/etc/openvpn --rm -it openvpn easyrsa build-client-full $user nopass
+docker run -v ~/datos-vpn:/etc/openvpn --rm -it darathor/openvpn easyrsa build-client-full $user nopass
 
-docker run -v ~/datos-vpn:/etc/openvpn --rm openvpn ovpn_getclient $user > $ruta/$user.ovpn
+docker run -v ~/datos-vpn:/etc/openvpn --rm darathor/openvpn ovpn_getclient $user > $ruta/$user.ovpn
