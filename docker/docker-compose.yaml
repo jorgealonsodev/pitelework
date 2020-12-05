@@ -4,7 +4,6 @@ services:
   openvpn:
     cap_add:
      - NET_ADMIN
-    # image: jorgealonsodev/openvpn-pi:v1
     image: darathor/openvpn
     container_name: openvpn
     ports:
@@ -96,6 +95,7 @@ services:
     volumes:
       - /mnt/nextcloud/data:/var/www/html
     environment:
+      - NEXTCLOUD_OVERWRITEPROTOCOL=https
       - POSTGRES_HOST=nextdb
       - POSTGRES_DB_FILE=/run/secrets/postgres_db
       - POSTGRES_USER_FILE=/run/secrets/postgres_user
@@ -115,7 +115,7 @@ services:
       - postgres_user
     networks:
       - net
-    # Despues de lanzar docker-compose up ejecutar
+    # Después de lanzar docker-compose up ejecutar
     # docker-compose exec --user www-data app php occ config:system:set overwriteprotocol --value="https"
 
   bitwarden:
