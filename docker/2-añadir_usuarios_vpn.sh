@@ -2,12 +2,10 @@
 
 echo '*** Introduzca nombre de usuario ***'
 
-read user
+read usuario
 
-echo '*** Introduzca la ruta donde quiere que se almacene el archivo de configuración del cliente ***'
+docker run -v ~/datos-vpn:/etc/openvpn --rm -it darathor/openvpn easyrsa build-client-full $usuario nopass
 
-read ruta
+docker run -v ~/datos-vpn:/etc/openvpn --rm darathor/openvpn ovpn_getclient $usuario > ~/$usuario.ovpn
 
-docker run -v ~/datos-vpn:/etc/openvpn --rm -it darathor/openvpn easyrsa build-client-full $user nopass
-
-docker run -v ~/datos-vpn:/etc/openvpn --rm darathor/openvpn ovpn_getclient $user > $ruta/$user.ovpn
+echo '*** El archivo de configuración se encuentra en /home/'$USER'/'$usuario'.ovpn ***'
