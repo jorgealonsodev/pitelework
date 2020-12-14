@@ -45,12 +45,16 @@ services:
     container_name: odoo-db
     restart: always
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_PASSWORD=odoo
-      - POSTGRES_USER=odoo
+      - POSTGRES_DB=/run/secrets/odoo/odoo_db
+      - POSTGRES_PASSWORD=/run/secrets/odoo/odoo_password
+      - POSTGRES_USER=/run/secrets/odoo/odoo_user
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - /mnt/odoo/data/pgdata:/var/lib/postgresql/data/pgdata
+    secrets:
+      - odoo_db
+      - odoo_password
+      - odoo_user
     networks:
       - odoo
   
@@ -231,6 +235,13 @@ secrets:
     file: /mnt/nextcloud/secrets/postgres_password.txt # put postgresql password to this file
   postgres_user:
     file: /mnt/nextcloud/secrets/postgres_user.txt # put postgresql username to this file
+  odoo_db:
+    file: /mnt/secrets/odoo/odoo_db.txt # put postgresql db name to this file
+  odoo_password:
+    file: /mnt/secrets/odoo/odoo_password.txt # put postgresql password to this file
+  odoo_user:
+    file: /mnt/secrets/odoo/odoo_user.txt # put postgresql username to this file
+  
 
 networks:
   net:
